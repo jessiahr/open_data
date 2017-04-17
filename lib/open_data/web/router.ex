@@ -15,7 +15,12 @@ defmodule OpenData.Web.Router do
 
   scope "/api", OpenData.Web do
     pipe_through :api
-    resources "/datastores", DatastoreController, except: [:new, :edit]
+    resources "/datastores", DatastoreController, except: [:new, :edit] do
+      resources "/topics", TopicController, except: [:new, :edit] do
+        get "/data" , TopicDataController, :index
+        get "/data/:id" , TopicDataController, :show
+      end
+    end
 
   end
 

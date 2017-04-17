@@ -20,10 +20,10 @@ defmodule OpenData.Web.DatastoreController do
     end
   end
 
-  def show(conn, %{"id" => id, "model" => model}) do
-    datastore = Ghostbuster.get_datastore_model(id, model)
-    render(conn, "show.json", datastore: datastore)
-  end
+  # def show(conn, %{"id" => id, "model" => model}) do
+  #   datastore = Ghostbuster.get_datastore_model(id, model)
+  #   render(conn, "show.json", datastore: datastore)
+  # end
 
   def show(conn, %{"id" => id}) do
     datastore = Ghostbuster.get_datastore!(id)

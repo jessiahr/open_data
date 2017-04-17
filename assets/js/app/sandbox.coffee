@@ -2,12 +2,22 @@ module.exports =
   mixins: [require('./mixins/datastore_mixin')]
   data: ->
     datastores: []
+    datastore: null
   ready: ->
     @getDatastores({}, (data) =>
       @datastores = data.data
       console.log data
     )
+    @getDatastore(1, {}, (data) =>
+      @datastore = data.data
+      console.log data
+    )
   methods:
+    getTopicData: ->
+        @getTopic(@datastore, {}, (data) =>
+          @datastore = data.data
+          console.log data
+        )
     create: ->
       datastore = {
         hostname: "localhost"
@@ -37,6 +47,7 @@ module.exports =
   #   showDetail: (audit)->
   #     @$router.go({ name: 'audit_show', params: { id: audit.id}})
   template: """
-{{datastores | json}}
 <a @click="create" >create</a>
+
+<a @click="getTopicData" >get topic</a>
   """

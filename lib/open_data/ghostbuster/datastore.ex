@@ -6,6 +6,7 @@ import IEx
     field :hostname, :string
     field :password, :string
     field :username, :string
+    has_many :topics, OpenData.Ghostbuster.Topic, on_delete: :delete_all
 
     timestamps()
   end
@@ -24,28 +25,4 @@ import IEx
     Process.exit(conn, :kill)
   end
 
-  def create_table(conn, schema) do
-    field_string = schema
-    |> Map.get("fields")
-    |> Enum.map(fn(field) ->
-      field_to_sql(field)
-    end)
-    |> Enum.join(", ")
-    name = Map.get(schema, "model")
-    # IO.puts "CREATE TABLE #{name} (#{field_string})"
-    Postgrex.query(conn, "CREATE TABLE #{name} (#{field_string})", [])
-  end
-
-  def field_to_sql(field) do
-     type = case Map.get(field, "type") do
-      "string" ->
-        "character varying(255)"
-      "text" ->
-        "text"
-      "boolean" ->
-        "boolean DEFAULT false NOT NULL"
-    end
-    Map.get(field, "name") <> " " <> type
-
-  end
 end
