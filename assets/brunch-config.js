@@ -56,8 +56,9 @@ exports.config = {
       "js/app.js": ["js/app"]
     }
   },
-
   npm: {
-    enabled: true
+    enabled: true,
+    styles: {"materialize-css": ['dist/css/materialize.css']}
+
   }
 };
