@@ -14,11 +14,10 @@ import IEx
   end
 
   def create(conn, params) do
-    with {:ok, _} <- Ghostbuster.create_topic_record(Map.get(params, "datastore_id"), Map.get(params, "topic_id"), Map.get(params, "topic_data")) do
+    with {:ok, row} <- Ghostbuster.create_topic_record(Map.get(params, "topic_id"), Map.get(params, "fields")) do
       conn
       |> put_status(:created)
-      # |> put_resp_header("location", datastore_topic_path(conn, :show, topic))
-      # |> render("show.json", topic: topic)
+      |> json(row)
     end
   end
 

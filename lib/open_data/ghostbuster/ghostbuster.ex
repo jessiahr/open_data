@@ -128,8 +128,12 @@ import IEx
       [%Topic{}, ...]
 
   """
-  def list_topics do
-    Repo.all(Topic)
+  def list_topics(params) do
+    case params do
+      %{"datastore_id" => datastore_id} ->
+        Repo.all from t in Topic,
+          where: t.datastore_id == ^datastore_id
+    end
   end
 
   def list_topic_records(datastore_id, topic_id) do
@@ -141,10 +145,10 @@ import IEx
       rows
   end
 
-  def create_topic_record(datastore_id, topic_id, record_body) do
-    datastore = Repo.get!(Datastore, datastore_id)
-    topic = Repo.get!(Topic, topic_id)
-    {:ok, conn} = Datastore.start_worker(datastore)
+  def create_topic_record(topic_id, record_body) do
+    # datastore = Repo.get!(Datastore, datastore_id)
+    topic = Repo.get!(Topic, topic_id) |> Repo.preload(:datastore)
+    {:ok, conn} = Datastore.start_worker(topic.datastore)
     row = Topic.insert_record(conn, topic, record_body)
     Datastore.stop_worker(conn)
     row
@@ -181,13 +185,14 @@ import IEx
     {:ok, topic} = %Topic{}
     |> topic_changeset(attrs)
     |> Repo.insert()
+  end
 
+  def create_topic_tables(topic) do
     datastore =  Repo.get!(Datastore, topic.datastore_id)
     {:ok, conn} = Datastore.start_worker(datastore)
-    Topic.create_table(conn, topic)
+    result = Topic.create_table(conn, topic)
     Datastore.stop_worker(conn)
-
-    topic
+    result
   end
 
   @doc """
@@ -240,6 +245,8 @@ import IEx
   defp topic_changeset(%Topic{} = topic, attrs) do
     topic
     |> cast(attrs, [:datastore_id, :name, :schema])
+    |> foreign_key_constraint(:datastore_id)
     |> validate_required([:datastore_id, :name, :schema])
+    |> unique_constraint(:name_datastore_id)
   end
 end
